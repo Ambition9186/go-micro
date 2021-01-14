@@ -165,6 +165,7 @@ func NewSync(opts ...sync.Option) sync.Sync {
 	// TODO: parse addresses
 	c, err := client.New(client.Config{
 		Endpoints: endpoints,
+		TLS:       options.TLSConfig,
 	})
 	if err != nil {
 		log.Fatal(err)

@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"crypto/tls"
 	"time"
 )
 
@@ -15,6 +16,13 @@ func Nodes(a ...string) Option {
 func Prefix(p string) Option {
 	return func(o *Options) {
 		o.Prefix = p
+	}
+}
+
+// WithTLS sets the TLS config for the sync
+func WithTLS(t *tls.Config) Option {
+	return func(o *Options) {
+		o.TLSConfig = t
 	}
 }
 
