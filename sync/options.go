@@ -1,9 +1,17 @@
 package sync
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 )
+
+// WithContext sets context for graceful exit
+func WithContext(c context.Context) Option {
+	return func(o *Options) {
+		o.Cxt = c
+	}
+}
 
 // Nodes sets the addresses to use
 func Nodes(a ...string) Option {
@@ -23,6 +31,13 @@ func Prefix(p string) Option {
 func WithTLS(t *tls.Config) Option {
 	return func(o *Options) {
 		o.TLSConfig = t
+	}
+}
+
+// LeaderContext sets context for graceful exit
+func LeaderContext(c context.Context) LeaderOption {
+	return func(o *LeaderOptions) {
+		o.Cxt = c
 	}
 }
 

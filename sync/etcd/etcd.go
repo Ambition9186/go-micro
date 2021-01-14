@@ -42,7 +42,7 @@ func (e *etcdSync) Leader(id string, opts ...sync.LeaderOption) (sync.Leader, er
 	}
 
 	// make path
-	path := path.Join(e.path, strings.Replace(e.options.Prefix+id, "/", "-", -1))
+	path := path.Join(e.path, strings.Replace(e.options.Prefix, "/", "-", -1))
 
 	s, err := cc.NewSession(e.client)
 	if err != nil {
@@ -51,7 +51,7 @@ func (e *etcdSync) Leader(id string, opts ...sync.LeaderOption) (sync.Leader, er
 
 	l := cc.NewElection(s, path)
 
-	if err := l.Campaign(context.TODO(), id); err != nil {
+	if err := l.Campaign(e.options.Cxt, id); err != nil {
 		return nil, err
 	}
 
@@ -64,7 +64,7 @@ func (e *etcdSync) Leader(id string, opts ...sync.LeaderOption) (sync.Leader, er
 
 func (e *etcdLeader) Status() chan bool {
 	ch := make(chan bool, 1)
-	ech := e.e.Observe(context.Background())
+	ech := e.e.Observe(e.opts.Cxt)
 
 	go func() {
 		for r := range ech {
@@ -80,7 +80,7 @@ func (e *etcdLeader) Status() chan bool {
 }
 
 func (e *etcdLeader) Resign() error {
-	return e.e.Resign(context.Background())
+	return e.e.Resign(e.opts.Cxt)
 }
 
 func (e *etcdSync) Init(opts ...sync.Option) error {
@@ -148,6 +148,10 @@ func NewSync(opts ...sync.Option) sync.Sync {
 	var options sync.Options
 	for _, o := range opts {
 		o(&options)
+	}
+
+	if options.Cxt == nil {
+		options.Cxt = context.Background()
 	}
 
 	var endpoints []string
